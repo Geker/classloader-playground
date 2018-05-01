@@ -1,14 +1,19 @@
 package com.oldratlee.land;
 
+import java.net.URL;
+import java.net.URLClassLoader;
+import java.util.Arrays;
+import java.util.EnumMap;
+import java.util.List;
+import java.util.Map;
+
 import com.oldratlee.land.matcher.DefaultLandMatcher;
 import com.oldratlee.land.matcher.LandMatcher;
 
-import java.net.URL;
-import java.net.URLClassLoader;
-import java.util.*;
-
 /**
- * Land ClassLoader.
+ * Land ClassLoader. 可配置加载顺序的ClassLoader。
+ * 但是需要注意其首先用systemClassLoader判断是否加载。然后再进行Parent/Child等Loader的加载。
+ * 如果Parent是SystemLoader。那么不再继续让Loader加载。
  *
  * @author ding.lid
  */
@@ -17,7 +22,14 @@ public class LandClassLoader extends URLClassLoader {
     private final Map<DelegateType, List<String>> delegateConfig;
     private final LandMatcher matcher;
 
-    public LandClassLoader(URL[] urls, Map<DelegateType, List<String>> delegateConfig) {
+	/**
+	 * Classloader Name
+	 */
+	private String name;
+
+
+
+	public LandClassLoader(URL[] urls, Map<DelegateType, List<String>> delegateConfig) {
         this(urls, delegateConfig, null, null);
     }
 
@@ -104,7 +116,7 @@ public class LandClassLoader extends URLClassLoader {
             case CHILD_ONLY:
                 // TODO improve exception message
                 return findClass(className);
-            case PARENT_CHILD:
+		case PARENT_CHILD:
                 return parentChild(className, parent);
             case CHILD_PARENT:
                 return childParent(className, parent);
@@ -168,8 +180,15 @@ public class LandClassLoader extends URLClassLoader {
         return false;
     }
 
+	public String getName() {
+		return name;
+	}
+
+	public void setName(String name) {
+		this.name = name;
+	}
     @Override
     public String toString() {
-        return LandClassLoader.class.getSimpleName() + "(urls: " + Arrays.toString(getURLs()) + ")";
+		return LandClassLoader.class.getSimpleName() + "-[" + name + "]" + "(urls: " + Arrays.toString(getURLs()) + ")";
     }
 }

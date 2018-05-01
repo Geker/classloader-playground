@@ -7,6 +7,6 @@ public enum DelegateType {
     NONE,
     CHILD_ONLY,
     PARENT_ONLY,
-    PARENT_CHILD,
+	PARENT_CHILD, // this is the default mode
     CHILD_PARENT
 }
